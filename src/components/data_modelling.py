@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, Date, create_engine
+from sqlalchemy import Column, Integer, String, Float, Date, create_engine, DateTime, CheckConstraint, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine import URL
+from sqlalchemy import MetaData,Table
 from datetime import date
 from src.logger import logging
-
+from src.exception import CustomException
+import sys
 # Define SQLAlchemy Base class
 Base = declarative_base()
 
@@ -11,13 +14,13 @@ Base = declarative_base()
 class WeatherData(Base):
     __tablename__ = 'weather_data'
 
-    id = Column(Integer, primary_key=True)
-    station_id = Column(String, nullable=False)
-    date = Column(Date, nullable=False, default=date.today)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    station_id = Column(String, nullable=False, index=True)
+    date = Column(Date, nullable=False, default=date.today, index=True)
     max_temp = Column(Float)
     min_temp = Column(Float)
-    precipitation = Column(Float)
-
+    precipitation = Column(Float, default=0.0)
+    
 # Configuration class for data modelling
 class DataModellingConfig:
     def __init__(self, database_uri):
@@ -27,35 +30,35 @@ class DataModellingConfig:
 # Main class for data modelling operations
 class DataModelling:
     def __init__(self, config):
-        self.engine = create_engine(config.database_uri)
-        self.Base = Base
-        self.Session = sessionmaker(bind=self.engine)
+        try:
+            self.engine = create_engine(config.database_uri)
+            self.Base = Base
+            self.Session = sessionmaker()
+            # Bind session to engine
+            self.Session.configure(bind=self.engine)
+            # Reflect existing tables and check for 'weather_data'
+            self.metadata = MetaData(bind=self.engine)
+            self.metadata.reflect()
+            if 'weather_data' not in self.metadata.tables:
+                logging.info("Creating 'weather_data' table...")
+                self.Base.metadata.create_all(self.engine)
+                logging.info("'weather_data' table created.")
+            else:
+                logging.info("'weather_data' table already exists.")
 
-        # Check if the database exists and create it if not
-        if not self.engine.has_table('weather_data'):
-            logging.info("Creating database tables...")
-            self.Base.metadata.create_all(self.engine)
-            logging.info("Database tables created.")
-        else:
-            logging.info("Database tables already exist.")
+        except Exception as e:
+            logging.error(f"Error initializing DataModelling: {e}")
+            raise CustomException(e, sys)
+        
+        
+    # def check_schema_update(self):
+    #     try:
+    #         if not self.engine.is_up_to_date():
+    #             logging.warning("Database schema may need updating.")
 
-    def query_weather_records(self):
-        with self.Session() as session:
-            try:
-                # Query all weather data records
-                weather_records = session.query(WeatherData).all()
-                logging.info("Retrieved weather records:")
+    #         logging.info("Database operations complete.")
+        
+    #     except Exception as e:
+    #         logging.error(f"Error checking schema update: {e}")
+    #         raise CustomException(e,sys)
 
-                for record in weather_records:
-                    logging.info(f"Record: {record.id}, {record.station_id}, {record.date}, {record.max_temp}, {record.min_temp}, {record.precipitation}")
-
-            except Exception as e:
-                logging.error(f"Error retrieving weather records: {e}")
-                session.rollback()
-                raise e
-
-    def check_schema_update(self):
-        if not self.engine.is_up_to_date():
-            logging.warning("Database schema may need updating.")
-
-        logging.info("Database operations complete.")

@@ -1,7 +1,7 @@
 # src/components/data_ingestion.py
 
 import logging
-from exception import CustomException
+from src.exception import CustomException
 import os
 import sys
 from datetime import datetime
@@ -9,33 +9,35 @@ from dataclasses import dataclass
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.components.data_modelling import WeatherData, Base
-from config.database_config import SQLALCHEMY_DATABASE_URI
+from src.config.database_config import SQLALCHEMY_DATABASE_URI
 
+# Create the SQLAlchemy engine and session
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)
-session = Session()
 
 @dataclass
 class DataIngestionConfig:
-
-
-
-
+    folder_path: str = "wx_data"
+    batch_size: int = 1000  #batch size for batch processing
 
 class DataIngestion:
-    def __init__(self):
-        self.ingestion_config= DataIngestionConfig()
-    
+    def __init__(self,ingestion_config:DataIngestionConfig):
+        self.ingestion_config = ingestion_config
+        logging.info(f"Data Ingestion Configuration: {self.ingestion_config}")
 
     def initiate_data_ingestion(self):
-        
         logging.info("Entered the data ingestion component")
+        session = Session()
+        records_processed = 0
+        batch_records = []
 
-        try: 
-            folder_path="wx_data"
+        try:
+            folder_path = self.ingestion_config.folder_path
+            logging.info(f"Reading files from folder: {folder_path}")
             for filename in os.listdir(folder_path):
                 if filename.endswith('.txt'):
                     file_path = os.path.join(folder_path, filename)
+                    logging.info(f"Processing file: {file_path}")
                     with open(file_path, 'r') as file:
                         for line in file:
                             data = line.strip().split('\t')
@@ -49,15 +51,29 @@ class DataIngestion:
                                     weather_entry = WeatherData(
                                         station_id=filename.split('.')[0],  # Assuming filename is station_id
                                         date=date,
-                                        max_temp=max_temp if max_temp != -999.9 else None,
-                                        min_temp=min_temp if min_temp != -999.9 else None,
-                                        precipitation=precipitation if precipitation != -999.9 else None
+                                        max_temp=max_temp if max_temp != -9999 else None,
+                                        min_temp=min_temp if min_temp != -9999 else None,
+                                        precipitation=precipitation if precipitation != -9999 else None
                                     )
-                                    session.add(weather_entry)
+                                    batch_records.append(weather_entry)
+                                    if len(batch_records) >= self.ingestion_config.batch_size:
+                                        session.bulk_save_objects(batch_records)
+                                        session.commit()
+                                        records_processed += len(batch_records)
+                                        logging.info(f"Committed {len(batch_records)} records to the database.")
+                                        batch_records.clear()
                                 except Exception as e:
-                                    print(f"Error processing line: {line}. Error: {e}")
-                    session.commit()
+                                    logging.error(f"Error processing line: {line}. Error: {e}")
+            if batch_records:
+                session.bulk_save_objects(batch_records)
+                session.commit()
+                records_processed += len(batch_records)
+                logging.info(f"Committed {len(batch_records)} remaining records to the database.")
+            logging.info(f"Total records processed: {records_processed}")
         except Exception as e:
-            raise CustomException(e,sys)
-
-
+            logging.error(f"Error in data ingestion process: {e}")
+            session.rollback()
+            raise CustomException(e, sys)
+        finally:
+            logging.info("Closing session")
+            session.close()
