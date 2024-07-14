@@ -33,6 +33,7 @@ class DataIngestion:
             session = Session()
             existing_records = session.query(WeatherData.station_id, WeatherData.date).all()
             self.existing_records = {(record.station_id, record.date) for record in existing_records}
+            
             session.close()
         except Exception as e:
             logging.error(f"Error fetching existing records from database: {e}")
@@ -41,7 +42,7 @@ class DataIngestion:
         try:
             with engine.connect() as connection:
                 connection.execute("""
-                    CREATE TEMP TABLE temp_weather_data (
+                    CREATE TABLE temp_weather_data (
                         station_id VARCHAR,
                         date DATE,
                         max_temp FLOAT,
@@ -88,6 +89,7 @@ class DataIngestion:
                             processed_count += 1
                         except Exception as e:
                             logging.error(f"Error processing line: {line}. Error: {e}")
+                            exit(1)
         
             logging.info(f"Finished processing file: {file_path}. Processed: {processed_count}, Duplicates: {duplicate_count}")
             
@@ -116,8 +118,7 @@ class DataIngestion:
         logging.info("Entered the data ingestion component")
 
         try:
-            self.create_temporary_table()
-
+            self.create_temporary_table() 
             folder_path = self.ingestion_config.folder_path
             logging.info(f"Reading files from folder: {folder_path}")
 
