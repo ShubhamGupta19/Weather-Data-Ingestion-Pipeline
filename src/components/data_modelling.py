@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, create_engine, DateTime, CheckConstraint, func
+from sqlalchemy import Column, Integer, String, Float, Date, create_engine, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import URL
@@ -20,6 +20,11 @@ class WeatherData(Base):
     max_temp = Column(Float)
     min_temp = Column(Float)
     precipitation = Column(Float, default=0.0)
+
+    # Define unique constraint on station_id and date
+    __table_args__ = (
+        UniqueConstraint('station_id', 'date', name='unique_station_date'),
+    )
     
 # Configuration class for data modelling
 class DataModellingConfig:
