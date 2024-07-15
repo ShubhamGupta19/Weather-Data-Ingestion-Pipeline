@@ -1,0 +1,9 @@
+{
+    "docify.commentService.programmingLanguage": "python",
+    "docify.commentService.docstringFormat": "Doxygen",
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

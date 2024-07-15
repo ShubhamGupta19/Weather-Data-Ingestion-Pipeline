@@ -12,6 +12,18 @@ Base = declarative_base()
 
 # Define the new data model to store the results
 class WeatherStationYearlyStats(Base):
+    """
+    ORM class representing yearly statistics for weather stations.
+
+    Attributes:
+        __tablename__ (str): Table name in the database.
+        id (int): Primary key, auto-incremented.
+        station_id (str): Station identifier, indexed and non-nullable.
+        year (int): Year of the statistics, indexed and non-nullable.
+        avg_max_temp (float): Average maximum temperature.
+        avg_min_temp (float): Average minimum temperature.
+        total_precipitation (float): Total precipitation.
+    """
     __tablename__ = 'weather_station_yearly_stats'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -26,6 +38,12 @@ class WeatherStationYearlyStats(Base):
     )
 
     def to_dict(self):
+        """
+        Convert object attributes to a dictionary format.
+
+        Returns:
+            dict: Dictionary representation of object attributes.
+        """
         return {
             'station_id': self.station_id,
             'year': self.year,
@@ -36,12 +54,38 @@ class WeatherStationYearlyStats(Base):
 
 
 class DataAnalysisConfig:
+    """
+    Configuration class for data analysis operations.
+
+    Attributes:
+        database_uri (str): URI for the database connection.
+    """
     def __init__(self, database_uri):
+        """
+        Initialize DataAnalysisConfig instance.
+
+        Args:
+            database_uri (str): URI for the database connection.
+        """
         self.database_uri = database_uri
 
 
 class DataAnalysis:
+    """
+    Class for handling data analysis operations.
+
+    Attributes:
+        engine (create_engine): SQLAlchemy engine instance.
+        Session (sessionmaker): SQLAlchemy sessionmaker instance.
+        metadata (MetaData): SQLAlchemy MetaData instance.
+    """
     def __init__(self, analysis_config: DataAnalysisConfig):
+        """
+        Initialize DataAnalysis instance.
+
+        Args:
+            analysis_config (DataAnalysisConfig): Configuration object containing analysis settings.
+        """
         try:
             self.engine = create_engine(analysis_config.database_uri)
             self.Session = sessionmaker(bind=self.engine)
@@ -52,6 +96,12 @@ class DataAnalysis:
             raise CustomException(e, sys)
 
     def create_weather_station_yearly_stats_table(self):
+        """
+        Create or update the 'weather_station_yearly_stats' table in the database.
+
+        Checks if the table exists and compares its schema with the defined ORM model.
+        If not exists or schema differs, creates or updates the table accordingly.
+        """
         try:
             if 'weather_station_yearly_stats' not in self.metadata.tables:
                 logging.info("Creating 'weather_station_yearly_stats' table...")
@@ -73,6 +123,12 @@ class DataAnalysis:
             raise CustomException(e, sys)
 
     def calculate_yearly_stats(self):
+        """
+        Calculate yearly statistics for weather stations based on weather data.
+
+        Returns:
+            list: List of tuples containing yearly statistics for each station.
+        """
         try:
             # Create a session
             session = self.Session()
@@ -88,7 +144,6 @@ class DataAnalysis:
                 WeatherData.station_id,
                 func.extract('year', WeatherData.date)
             ).all()
-            
 
             return yearly_stats
 
@@ -99,6 +154,15 @@ class DataAnalysis:
             session.close()
 
     def store_yearly_stats(self, yearly_stats):
+        """
+        Store calculated yearly statistics into the 'weather_station_yearly_stats' table.
+
+        Args:
+            yearly_stats (list): List of tuples containing yearly statistics for each station.
+
+        Raises:
+            CustomException: If there is an error in storing the statistics.
+        """
         try:
             # Create a session
             session = self.Session()
@@ -124,7 +188,7 @@ class DataAnalysis:
                     session.add(new_record)
 
             # Commit the transaction
-            logging.info(f"{skipped_records} records already exists. Skipping.")
+            logging.info(f"{skipped_records} records already exist. Skipping.")
             session.commit()
             logging.info("Yearly statistics stored successfully")
 
