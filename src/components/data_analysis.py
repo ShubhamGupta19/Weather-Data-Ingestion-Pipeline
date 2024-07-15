@@ -25,6 +25,15 @@ class WeatherStationYearlyStats(Base):
         UniqueConstraint('station_id', 'year', name='unique_station_year'),
     )
 
+    def to_dict(self):
+        return {
+            'station_id': self.station_id,
+            'year': self.year,
+            'avg_max_temp': self.avg_max_temp,
+            'avg_min_temp': self.avg_min_temp,
+            'total_precipitation': self.total_precipitation
+        }
+
 
 class DataAnalysisConfig:
     def __init__(self, database_uri):

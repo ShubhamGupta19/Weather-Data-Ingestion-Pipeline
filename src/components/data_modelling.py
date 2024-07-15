@@ -24,7 +24,16 @@ class WeatherData(Base):
     # Define unique constraint on station_id and date
     __table_args__ = (
         UniqueConstraint('station_id', 'date', name='unique_station_date'),
+    
     )
+    def to_dict(self):
+        return {
+            'station_id': self.station_id,
+            'date': self.date.isoformat(),
+            'max_temp': self.max_temp,
+            'min_temp': self.min_temp,
+            'precipitation': self.precipitation
+        }
     
 # Configuration class for data modelling
 class DataModellingConfig:
@@ -54,6 +63,9 @@ class DataModelling:
         except Exception as e:
             logging.error(f"Error initializing DataModelling: {e}")
             raise CustomException(e, sys)
+        
+
+    
         
         
     # def check_schema_update(self):
