@@ -270,3 +270,4 @@ class WeatherStationYearlyStats(Base):
 
 By following these steps, you can set up the project, ingest and analyze weather data, deploy API endpoints, and verify their functionality using Swagger UI.
 
+
