@@ -142,7 +142,8 @@ class WeatherStationYearlyStats(Base):
                 func.extract('year', WeatherData.date)
             ).all()
 
-            return yearly_stats```
+            return yearly_stats
+```
 
     
     Store Yearly Stats: Inserted the computed statistics into the weather_station_yearly_stats table.
