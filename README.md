@@ -121,15 +121,31 @@ class WeatherStationYearlyStats(Base):
 
 ## Data Ingestion Process
 
-    Fetch Existing Records: Load existing (station_id, date) pairs to avoid duplicates.
-    Temporary Table Creation: Create a temporary table for staging.
-    File Processing: Parse, validate, and clean data from files, and insert valid records into the temporary table.
-    Insert Into Main Table: Transfer data from the temporary table to the main table.
+    Fetch Existing Records: Loaded existing (station_id, date) pairs to avoid duplicates.
+    Temporary Table Creation: Created a temporary table for staging.
+    File Processing: Parsed, validated, and cleaned data from files parallely, and inserted valid records into the temporary table.
+    Insert Into Main Table: Transferred data from the temporary table into the main table.
 
 ## Data Analysis Process
 
-    Calculate Yearly Stats: Compute average maximum temperature, average minimum temperature, and total precipitation for each station and year.
-    Store Yearly Stats: Insert the computed statistics into the weather_station_yearly_stats table.
+    Calculate Yearly Stats: Computed average maximum temperature, average minimum temperature, and total precipitation for each station and year.
+```python
+            # Query to calculate the statistics
+            yearly_stats = session.query(
+                WeatherData.station_id,
+                func.extract('year', WeatherData.date).label('year'),
+                func.avg(case([(WeatherData.max_temp != None, WeatherData.max_temp)], else_=None)).label('avg_max_temp'),
+                func.avg(case([(WeatherData.min_temp != None, WeatherData.min_temp)], else_=None)).label('avg_min_temp'),
+                func.sum(case([(WeatherData.precipitation != None, WeatherData.precipitation)], else_=0.0)).label('total_precipitation')
+            ).group_by(
+                WeatherData.station_id,
+                func.extract('year', WeatherData.date)
+            ).all()
+
+            return yearly_stats'''
+
+    
+    Store Yearly Stats: Inserted the computed statistics into the weather_station_yearly_stats table.
 
 
 
