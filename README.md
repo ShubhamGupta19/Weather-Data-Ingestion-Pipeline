@@ -4,6 +4,14 @@
 
 The goal of this project is to build a robust data ingestion pipeline that processes weather data from multiple files, stores it in a database, and performs analysis to derive valuable insights. The weather data includes daily records of maximum temperature, minimum temperature, and precipitation for different weather stations. This processed data can be used for various analytical purposes, including understanding weather patterns, climate change studies, and supporting agricultural decision-making.
 
+## Tech Stack
+
+- **Python**: Programming language used for scripting and data processing.
+- **Flask**: Micro-framework used for building web APIs.
+- **SQLAlchemy**: SQL toolkit and Object-Relational Mapping (ORM) library used for database interactions.
+- **PostgreSQL**: Relational database management system used for storing weather data.
+- **Git**: Version control system used for managing project source code.
+
 ## Project Plan
 
 ### Phase 1: Data Modeling
