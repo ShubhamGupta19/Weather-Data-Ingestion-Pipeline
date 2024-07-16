@@ -14,23 +14,30 @@ The goal of this project is to build a robust data ingestion pipeline that proce
 
 ## Project Plan
 
-### Phase 1: Data Modeling
+### Phase 0: Setting up PostgreSQL Database
+- Install and configure PostgreSQL for storing weather data.
 
-- Define a data model using SQLAlchemy to store weather data.
-- Create necessary tables in the database.
+### Phase 1: Data Modeling
+- Define SQLAlchemy models (`WeatherData` and `WeatherStationYearlyStats`) for weather data storage.
+- Create tables in PostgreSQL database using SQLAlchemy.
 
 ### Phase 2: Data Ingestion
-
-- Fetch existing records from the database to avoid duplicates.
-- Create a temporary table for staging data.
-- Process each weather data file, validate and clean the data, and insert valid records into the temporary table.
-- Transfer data from the temporary table to the main weather data table.
+- Implement a data ingestion pipeline to fetch existing records and avoid duplicates.
+- Create a temporary staging table for processing data files.
+- Parse, validate, and clean weather data from files.
+- Insert validated records into the temporary table.
+- Transfer data from the staging table to the main `weather_data` table in PostgreSQL.
 
 ### Phase 3: Data Analysis
+- Define models (`WeatherStationYearlyStats`) to store calculated yearly weather statistics.
+- Calculate average maximum temperature, average minimum temperature, and total precipitation for each weather station and year.
+- Store calculated statistics in the `weather_station_yearly_stats` table.
 
-- Define a new data model to store yearly weather statistics.
-- Calculate yearly statistics for each weather station.
-- Store the calculated statistics in the database.
+### Phase 4: API Development
+- Develop RESTful APIs using Flask to expose weather data and statistics.
+- Implement endpoints for retrieving weather data by station ID, date, and statistical summaries.
+- Ensure robust error handling and validation for API requests.
+
 
 ## Initial Data Collection Report
 
@@ -166,4 +173,84 @@ class WeatherStationYearlyStats(Base):
   - **swagger.json**: Swagger API specification file.
 
 - **__init__.py**: Initialization script for the entire project.
+- **wx_data**: Contains the data in multiple files of .txt format.
+
+
+
+
+# Project Setup and Usage
+
+## Phase 0: Setting Up PostgreSQL
+
+1. **Install PostgreSQL:**
+   - Download and install PostgreSQL from the [official website](https://www.postgresql.org/download/) or package manager.
+
+2. **Create Database:**
+   - Open a terminal or PostgreSQL client.
+   - Create a new database for the project:
+     ```sql
+     CREATE DATABASE weather_db;
+     ```
+3. **Update Database configurations:**
+   ```python
+   from sqlalchemy import create_engine
+    db_username = 'your_username'
+    db_password = 'your_password'
+    db_host = 'localhost'
+    db_port = '5433'
+    db_name = 'weather_db'
+    
+    SQLALCHEMY_DATABASE_URI = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}'
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)```
+
+   
+
+## Phase 1: Data Modelling and Ingestion
+
+1. **Clone Git Repository:**
+   - Clone the project repository from Git:
+     ```bash
+     git clone https://github.com/ShubhamGupta19/Weather-Data-Ingestion-Pipeline.git
+     ```
+
+2. **Install Dependencies:**
+   - Install required Python packages listed in `requirements.txt`:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **Run Data Ingestion Script:**
+   - Execute `main.py` to start the data ingestion process:
+     ```bash
+     python main.py
+     ```
+   - The tables will be created in the database and the data from folder `wx_data` will be ingested into those tables.
+
+## Phase 2: API Implementation
+
+1. **Run Flask Application:**
+   - Start the Flask application to deploy API endpoints:
+     ```bash
+     python app.py
+     ```
+
+2. **Access Swagger UI:**
+   - Open a web browser and go to `http://localhost:5000/swagger` to access Swagger UI.
+   - Use Swagger UI to test the implemented API endpoints (`/api/weather` and `/api/weather/stats`).
+
+## Verification
+
+- **Explore API Endpoints:**
+  - Test each API endpoint using Swagger UI by providing appropriate query parameters (`station_id`, `date`, `page`, `per_page`).
+  - Verify responses to ensure correct functionality and data retrieval.
+
+---
+
+### Additional Notes
+
+- **Swagger Integration:** Ensure `swagger.json` accurately reflects the API endpoints defined in `routes.py`.
+- **Testing:** Use tools like Postman or curl commands for more extensive testing beyond Swagger UI.
+
+By following these steps, you can set up the project, ingest and analyze weather data, deploy API endpoints, and verify their functionality using Swagger UI.
+
 
