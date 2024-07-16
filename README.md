@@ -153,7 +153,6 @@ class WeatherStationYearlyStats(Base):
 ## Directory Structure
 
 - **app.py**: Entry point of the application.
-- **dir_stuc.py**: File (possibly for directory structure definition or similar purpose).
 - **main.py**: Main script or module for the project.
 - **README.md**: Project documentation file.
 - **requirements.txt**: File listing dependencies required for the project.
