@@ -150,10 +150,10 @@ class WeatherStationYearlyStats(Base):
 
 
 ## Data Flow Diagrams
-![Data Flow Diagram](images\WeatherDataFiles.png)
+![Data Flow Diagram](images/WeatherDataFiles.png)
 
 ## Data Flow Diagram
-![Building Blocks](images\Workflow.png)
+![Building Blocks](images/Workflow.png)
 
 ## Directory Structure
 
