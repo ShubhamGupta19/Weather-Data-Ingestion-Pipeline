@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from sqlalchemy import Column, Integer, String, Float, Date, create_engine, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import MetaData
 from datetime import date
-from src.logger import logging  # Assuming logging setup in 'src/logger.py'
+from src.logger import logging
 from src.exception import CustomException
 import sys
 
@@ -51,6 +52,7 @@ class WeatherData(Base):
             'precipitation': self.precipitation
         }
 
+@dataclass
 class DataModellingConfig:
     """
     Configuration class for data modeling operations.
