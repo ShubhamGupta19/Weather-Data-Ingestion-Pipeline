@@ -123,3 +123,47 @@ class WeatherStationYearlyStats(Base):
 
     Calculate Yearly Stats: Compute average maximum temperature, average minimum temperature, and total precipitation for each station and year.
     Store Yearly Stats: Insert the computed statistics into the weather_station_yearly_stats table.
+
+
+
+## Directory Structure
+
+- **app.py**: Entry point of the application.
+- **dir_stuc.py**: File (possibly for directory structure definition or similar purpose).
+- **main.py**: Main script or module for the project.
+- **README.md**: Project documentation file.
+- **requirements.txt**: File listing dependencies required for the project.
+- **setup.py**: Script for setting up the project environment.
+- **src/**: Root directory for source code.
+
+  - **api/**: Module for handling API routes and logic.
+    - **routes.py**: Defines API endpoints and their corresponding functions.
+    - **__init__.py**: Initialization script for the `api` module.
+
+  - **components/**: Module for different components of the project.
+    - **data_analysis.py**: Contains logic for analyzing weather data.
+    - **data_ingestion.py**: Handles the ingestion of weather data.
+    - **data_modelling.py**: Defines SQLAlchemy models for weather data.
+    - **__init__.py**: Initialization script for the `components` module.
+
+  - **config/**: Configuration files for database and possibly other settings.
+    - **database_config.py**: Configuration for database connection.
+    - **__init__.py**: Initialization script for the `config` module.
+
+  - **exception.py**: Module defining custom exceptions for error handling.
+  - **logger.py**: Module defining logging configuration and utilities.
+  
+  - **models/**: Directory possibly for additional data models.
+    - **__init__.py**: Initialization script for the `models` module.
+
+  - **services/**: Contains business logic or service layers.
+    - **weather_service.py**: Implements services related to weather data.
+    - **__init__.py**: Initialization script for the `services` module.
+
+  - **__init__.py**: Initialization script for the `src` package.
+  
+- **static/**: Directory possibly for static files.
+  - **swagger.json**: Swagger API specification file.
+
+- **__init__.py**: Initialization script for the entire project.
+
