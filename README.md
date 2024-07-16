@@ -149,6 +149,11 @@ class WeatherStationYearlyStats(Base):
     Store Yearly Stats: Inserted the computed statistics into the weather_station_yearly_stats table.
 
 
+## Data Flow Diagrams
+![Data Flow Diagram](images\WeatherDataFiles.png)
+
+## Data Flow Diagram
+![Building Blocks](images\Workflow.png)
 
 ## Directory Structure
 
